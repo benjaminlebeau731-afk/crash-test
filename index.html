@@ -1,49 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>⚡ INSTANT LOCK ⚡</title>
+    <title>⚡ PERSISTENT FULLSCREEN ⚡</title>
     <style>
         body { 
-            background: #000; color: #f00; font-family: 'Courier New', Courier, monospace; 
-            height: 100vh; margin: 0; display: flex; align-items: center; 
-            justify-content: center; overflow: hidden; cursor: none;
+            background: #000; color: #0f0; font-family: monospace; 
+            height: 100vh; margin: 0; display: flex; 
+            align-items: center; justify-content: center; overflow: hidden; 
         }
-        h1 { font-size: 3rem; text-shadow: 0 0 20px #f00; text-align: center; }
+        h1 { text-align: center; }
     </style>
 </head>
 <body>
-    <h1>[ SYSTEM OVERLOAD ]</h1>
+    <div id="init">
+        <h1>[ SYSTEM STABLE ]</h1>
+        <p>Click to enter secure mode.</p>
+    </div>
 
     <script>
-        function attack() {
-            // 1. Instant Fullscreen + Mouse Trap
+        function lock() {
             document.documentElement.requestFullscreen().catch(() => {});
-            document.body.requestPointerLock();
-
-            // 2. The Pop-up Spam
-            // We use a tiny timeout so the browser doesn't completely freeze,
-            // allowing it to process the Fullscreen request before the next alert.
-            setTimeout(() => {
-                alert("⚠ SYSTEM CRITICAL ⚠\nRE-LOCKING INTERFACE...");
-                alert("⚠ ACCESS DENIED ⚠");
-                alert("⚠ FULLSCREEN OVERRIDE ⚠");
-                
-                // Immediately call itself back
-                attack(); 
-            }, 1);
+            document.getElementById('init').innerHTML = "<h1>[ LOCK ACTIVE ]</h1><p>Attempting to exit will trigger override.</p>";
         }
 
-        // Trigger on any interaction
-        window.onclick = attack;
-        window.onkeydown = attack;
-
-        // Force snap-back if they try to escape
-        document.onfullscreenchange = () => {
+        function forceBack() {
+            // Check if the user is currently NOT in fullscreen
             if (!document.fullscreenElement) {
-                attack();
+                // 1. Hammer the pop-ups
+                alert("⚠ EXIT DETECTED ⚠");
+                alert("⚠ RE-ESTABLISHING SECURE CONNECTION ⚠");
+                alert("⚠ FULLSCREEN MANDATORY ⚠");
+
+                // 2. Force them back in
+                // The click on the "OK" button counts as the gesture needed to re-fullscreen
+                document.documentElement.requestFullscreen().catch(() => {});
             }
+        }
+
+        // Initial entry
+        window.onclick = lock;
+
+        // THE WATCHER: Triggers every time the fullscreen state changes
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                // User just tried to exit!
+                forceBack();
+            }
+        });
+
+        // Backup: catch keyboard escapes
+        window.onkeydown = (e) => {
+            if (e.key === "Escape") forceBack();
         };
     </script>
 </body>
 </html>
-
