@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crash Test</title>
+</head>
+<body>
+    <h1>Testing Browser Stability...</h1>
+    <script>
+        // Warning: This will make the tab unresponsive
+        let txt = "a";
+        while(true) {
+            txt = txt + txt; // Exponentially increases string size to consume RAM
+        }
+    </script>
+</body>
+</html>
